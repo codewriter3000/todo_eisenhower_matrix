@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,13 +38,15 @@ import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 
 import com.example.todo_eisenhower_matrix.data.Task
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTaskScreen(
     task: Task,
     onSave: (Task) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onDelete: (Task) -> Unit = {}
 ) {
     // 1. Local state initialized with the existing task data
     var title by remember { mutableStateOf(task.title) }
@@ -58,7 +61,8 @@ fun EditTaskScreen(
     var showDueDatePicker by remember { mutableStateOf(false) }
     var showReminderPicker by remember { mutableStateOf(false) }
 
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
     Scaffold(
         topBar = {
@@ -70,6 +74,9 @@ fun EditTaskScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { onDelete(task) }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete Task")
+                    }
                     TextButton(onClick = {
                         // Pass the modified task back
                         onSave(
@@ -171,7 +178,7 @@ fun EditTaskScreen(
                 Column {
                     Text("Reminder")
                     Text(
-                        text = reminderTime?.format(dateFormatter) ?: "None set",
+                        text = reminderTime?.format(dateTimeFormatter) ?: "None set",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -195,8 +202,8 @@ fun EditTaskScreen(
 
     // Dialogs
     if (showDueDatePicker) {
-        DateTimePickerDialog(
-            initialDate = dueDate ?: java.time.LocalDateTime.now(),
+        MyDatePickerDialog(
+            initialDate = dueDate ?: java.time.LocalDate.now(),
             onDismiss = { showDueDatePicker = false },
             onConfirm = {
                 dueDate = it
@@ -207,7 +214,7 @@ fun EditTaskScreen(
 
     if (showReminderPicker) {
         DateTimePickerDialog(
-            initialDate = reminderTime ?: java.time.LocalDateTime.now(),
+            initialDateTime = reminderTime ?: LocalDateTime.now(),
             onDismiss = { showReminderPicker = false },
             onConfirm = {
                 reminderTime = it

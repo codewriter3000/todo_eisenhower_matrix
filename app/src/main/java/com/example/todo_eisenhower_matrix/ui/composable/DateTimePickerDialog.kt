@@ -5,36 +5,71 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun MyDatePickerDialog(
+    initialDate: LocalDate = LocalDate.now(),
+    onDismiss: () -> Unit,
+    onConfirm: (LocalDate) -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDate
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { millis ->
+                    val selectedDate = Instant.ofEpochMilli(millis)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                    onConfirm(selectedDate)
+                }
+            }) { Text("Confirm") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun DateTimePickerDialog(
-    initialDate: LocalDateTime = LocalDateTime.now(),
+    initialDateTime: LocalDateTime = LocalDateTime.now(),
     onDismiss: () -> Unit,
     onConfirm: (LocalDateTime) -> Unit
 ) {
     // Remember the is24Hour boolean
     val context = LocalContext.current
-    var is24Hour by remember { mutableStateOf(DateFormat.is24HourFormat(context)) }
+    val is24Hour = remember { DateFormat.is24HourFormat(context) }
 
     // Track whether we are showing the Date picker or Time picker
     var isPickingTime by remember { mutableStateOf(false) }
 
     // 1. Date Picker State
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate
+        initialSelectedDateMillis = initialDateTime
             .atZone(ZoneId.systemDefault())
             .toInstant()
             .toEpochMilli()
     )
 
-    // 2. Time Picker State configured for 24-hour clock
+    // 2. Time Picker State configured for system settings
     val timePickerState = rememberTimePickerState(
-        initialHour = initialDate.hour,
-        initialMinute = initialDate.minute,
+        initialHour = initialDateTime.hour,
+        initialMinute = initialDateTime.minute,
         is24Hour = is24Hour
     )
 
@@ -52,7 +87,7 @@ fun DateTimePickerDialog(
             DatePicker(state = datePickerState)
         }
     } else {
-        // Step 2: Pick Time (Material 3 doesn't have a default TimePickerDialog, so we wrap it in an AlertDialog)
+        // Step 2: Pick Time
         AlertDialog(
             onDismissRequest = onDismiss,
             confirmButton = {

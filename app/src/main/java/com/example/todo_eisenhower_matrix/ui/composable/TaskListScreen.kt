@@ -13,21 +13,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -41,7 +41,8 @@ import com.example.todo_eisenhower_matrix.data.Task
 fun TaskListScreen(
     tasks: List<Task> = emptyList(),
     onAddTaskClick: () -> Unit = {},
-    onTaskClick: (Task) -> Unit = {}
+    onTaskClick: (Task) -> Unit = {},
+    onToggleTask: (Task) -> Unit = {}
 ) {
     val tasks = remember { tasks }
 
@@ -57,14 +58,15 @@ fun TaskListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onAddTaskClick() }) {
-                Text("+")
+                Icon(Icons.Default.Add, contentDescription = "Add Task")
             }
         }
     ) { paddingValues ->
         TaskList(
             tasks = tasks,
             modifier = Modifier.padding(paddingValues),
-            onTaskClick = onTaskClick
+            onTaskClick = onTaskClick,
+            onToggleTask = onToggleTask
         )
     }
 }
@@ -74,7 +76,8 @@ fun TaskListScreen(
 fun TaskList(
     tasks: List<Task>,
     modifier: Modifier = Modifier,
-    onTaskClick: (Task) -> Unit = {}
+    onTaskClick: (Task) -> Unit = {},
+    onToggleTask: (Task) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -85,7 +88,7 @@ fun TaskList(
             items = tasks,
             key = { task -> task.id }
         ) { task ->
-            TaskItem(task = task, onTaskClick = onTaskClick)
+            TaskItem(task = task, onTaskClick = onTaskClick, onToggleTask = onToggleTask)
         }
     }
 }
@@ -94,10 +97,9 @@ fun TaskList(
 @Composable
 fun TaskItem(
     task: Task,
-    onTaskClick: (Task) -> Unit
+    onTaskClick: (Task) -> Unit,
+    onToggleTask: (Task) -> Unit
 ) {
-    var isChecked by remember { mutableStateOf(task.isComplete) }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,8 +116,8 @@ fun TaskItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = isChecked,
-                onCheckedChange = { isChecked = it }
+                checked = task.isComplete,
+                onCheckedChange = { onToggleTask(task) }
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -124,8 +126,8 @@ fun TaskItem(
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.titleMedium,
-                    textDecoration = if (isChecked) TextDecoration.LineThrough else TextDecoration.None,
-                    color = if (isChecked) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
+                    textDecoration = if (task.isComplete) TextDecoration.LineThrough else TextDecoration.None,
+                    color = if (task.isComplete) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))

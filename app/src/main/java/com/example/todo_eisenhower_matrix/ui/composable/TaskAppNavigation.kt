@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo_eisenhower_matrix.data.Task
 import com.example.todo_eisenhower_matrix.ui.viewmodel.TaskViewModel
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Composable
 fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
@@ -19,10 +19,18 @@ fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
         EditTaskScreen(
             task = selectedTask!!,
             onSave = { updatedTask ->
-                viewModel.updateTask(updatedTask)
+                if (tasks.any { it.id == updatedTask.id }) {
+                    viewModel.updateTask(updatedTask)
+                } else {
+                    viewModel.addTask(updatedTask)
+                }
                 isEditing = false // Go back to list
             },
-            onCancel = { isEditing = false }
+            onCancel = { isEditing = false },
+            onDelete = { taskToDelete ->
+                viewModel.deleteTask(taskToDelete.id)
+                isEditing = false
+            }
         )
     } else {
         // Pass callbacks to handle the Floating Action Button and List Item clicks
@@ -30,13 +38,16 @@ fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
             tasks = tasks,
             onAddTaskClick = {
                 // Create a temporary task and immediately open the edit screen
-                val newTask = Task(title = "", dueDate = LocalDateTime.now())
+                val newTask = Task(title = "", dueDate = LocalDate.now())
                 selectedTask = newTask
                 isEditing = true
             },
             onTaskClick = { clickedTask ->
                 selectedTask = clickedTask
                 isEditing = true
+            },
+            onToggleTask = { taskToToggle ->
+                viewModel.toggleTaskCompletion(taskToToggle.id)
             }
         )
     }
