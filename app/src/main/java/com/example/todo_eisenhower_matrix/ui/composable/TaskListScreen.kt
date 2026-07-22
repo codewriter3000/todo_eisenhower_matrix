@@ -34,7 +34,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.todo_eisenhower_matrix.data.Task
-import java.time.LocalDateTime
 
 // The main Screen Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,34 +43,7 @@ fun TaskListScreen(
     onAddTaskClick: () -> Unit = {},
     onTaskClick: (Task) -> Unit = {}
 ) {
-    val tasks = remember {
-        listOf(
-            Task(
-                title = "Fix production crash",
-                isComplete = false,
-                isUrgent = true,
-                isImportant = true,
-                dueDate = LocalDateTime.now().plusHours(2),
-                reminderTime = LocalDateTime.now().plusHours(1),
-            ),
-            Task(
-                title = "Plan Q3 roadmap",
-                isComplete = false,
-                isUrgent = false,
-                isImportant = true,
-                dueDate = LocalDateTime.now().plusDays(3),
-                reminderTime = null,
-            ),
-            Task(
-                title = "Reply to team emails",
-                isComplete = true,
-                isUrgent = true,
-                isImportant = false,
-                dueDate = LocalDateTime.now().minusDays(1),
-                reminderTime = null,
-            )
-        )
-    }
+    val tasks = remember { tasks }
 
     Scaffold(
         topBar = {
@@ -184,12 +156,11 @@ fun TaskItem(
 // 5. Helper UI component
 @Composable
 fun MatrixLabel(isUrgent: Boolean, isImportant: Boolean) {
-    // TODO change these labels to be more descriptive
     val labelText = when {
-        isUrgent && isImportant -> "Do First"
-        !isUrgent && isImportant -> "Schedule"
-        isUrgent && !isImportant -> "Delegate"
-        else -> "Eliminate"
+        isUrgent && isImportant -> "Urgent and Important"
+        !isUrgent && isImportant -> "Important"
+        isUrgent && !isImportant -> "Urgent"
+        else -> ""
     }
 
     Text(

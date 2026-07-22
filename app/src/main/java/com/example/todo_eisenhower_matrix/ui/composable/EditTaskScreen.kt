@@ -55,6 +55,9 @@ fun EditTaskScreen(
     var dueDate by remember { mutableStateOf(task.dueDate) }
     var reminderTime by remember { mutableStateOf(task.reminderTime) }
 
+    var showDueDatePicker by remember { mutableStateOf(false) }
+    var showReminderPicker by remember { mutableStateOf(false) }
+
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
     Scaffold(
@@ -135,11 +138,11 @@ fun EditTaskScreen(
             // 4. Date and Time Settings
             Text(text = "Timing", style = MaterialTheme.typography.titleMedium)
 
-            // Due Date Row (Simulates a clickable area to open a picker)
+            // Due Date Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* TODO: Open Date/Time Picker */ }
+                    .clickable { showDueDatePicker = true }
                     .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -159,7 +162,7 @@ fun EditTaskScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* TODO: Open Date/Time Picker */ }
+                    .clickable { showReminderPicker = true }
                     .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -188,6 +191,29 @@ fun EditTaskScreen(
                 onCheckedChange = { isComplete = it }
             )
         }
+    }
+
+    // Dialogs
+    if (showDueDatePicker) {
+        DateTimePickerDialog(
+            initialDate = dueDate ?: java.time.LocalDateTime.now(),
+            onDismiss = { showDueDatePicker = false },
+            onConfirm = {
+                dueDate = it
+                showDueDatePicker = false
+            }
+        )
+    }
+
+    if (showReminderPicker) {
+        DateTimePickerDialog(
+            initialDate = reminderTime ?: java.time.LocalDateTime.now(),
+            onDismiss = { showReminderPicker = false },
+            onConfirm = {
+                reminderTime = it
+                showReminderPicker = false
+            }
+        )
     }
 }
 

@@ -1,7 +1,9 @@
 package com.example.todo_eisenhower_matrix.ui.composable
 
+import android.text.format.DateFormat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -14,6 +16,10 @@ fun DateTimePickerDialog(
     onDismiss: () -> Unit,
     onConfirm: (LocalDateTime) -> Unit
 ) {
+    // Remember the is24Hour boolean
+    val context = LocalContext.current
+    var is24Hour by remember { mutableStateOf(DateFormat.is24HourFormat(context)) }
+
     // Track whether we are showing the Date picker or Time picker
     var isPickingTime by remember { mutableStateOf(false) }
 
@@ -29,7 +35,7 @@ fun DateTimePickerDialog(
     val timePickerState = rememberTimePickerState(
         initialHour = initialDate.hour,
         initialMinute = initialDate.minute,
-        is24Hour = true
+        is24Hour = is24Hour
     )
 
     if (!isPickingTime) {
