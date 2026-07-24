@@ -1,112 +1,160 @@
 package com.example.todo_eisenhower_matrix.services
 
+import android.Manifest
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.RequiresPermission
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
 import com.example.todo_eisenhower_matrix.MainActivity
 import com.example.todo_eisenhower_matrix.R
+import com.example.todo_eisenhower_matrix.data.Task
+import java.time.ZoneId
 
-// TODO Execute channel creation as soon as app opens
-class ReminderService(content: String) {
-    // Constants
-    val channelId = "eisenhower_matrix_reminder"
-    val notificationId = 101
+object ReminderService {
+    const val CHANNEL_ID = "eisenhower_matrix_reminder"
+    const val NOTIFICATION_ID_BASE = 1000
 
-    val textTitle = "Reminder"
-    val textContent = content
     fun createNotificationChannel(context: Context) {
-        // Create the NotificationChannel (API 26+ only)
         val name = context.getString(R.string.channel_name)
         val descriptionText = context.getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, name, importance).apply {
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
             description = descriptionText
         }
-        // Register the channel with the system.
         val notificationManager: NotificationManager =
-            context.getSystemService(NotificationManager::class.java) as NotificationManager
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
-    // 2. Build & Post the Notification
-    @RequiresPermission("android.permission.POST_NOTIFICATIONS")
-    fun showNotification(context: Context) {
-        // Make sure the channel exists first
-        createNotificationChannel(context)
+    fun scheduleReminderNotification(context: Context, task: Task) {
+        val reminderTime = task.reminderTime ?: return
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        val tapAction = tapAction(context)
-        val snoozeAction = bottomAction("ACTION_SNOOZE", 1, context)
-        val completeAction = bottomAction("ACTION_COMPLETE", 2, context)
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = "ACTION_SHOW_NOTIFICATION"
+            putExtra("TASK_ID", task.id.toString())
+            putExtra("TASK_TITLE", task.title)
+        }
 
-        // Construct the notification visual & behavior properties
-        val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your drawable resource
-            .setContentTitle(textTitle)
-            .setContentText(textContent)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            task.id.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val triggerAtMillis = reminderTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent
+                )
+            } else {
+                // Fallback for devices where permission is not granted
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent
+                )
+            }
+        } else {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerAtMillis,
+                pendingIntent
+            )
+        }
+    }
+
+    fun showNotification(context: Context, taskTitle: String, notificationId: Int) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        val tapAction = getTapAction(context)
+        val snoozeAction = getBottomAction("ACTION_SNOOZE", 1, context, notificationId)
+        val completeAction = getBottomAction("ACTION_COMPLETE", 2, context, notificationId)
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Reminder")
+            .setContentText(taskTitle)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(tapAction)
             .addAction(R.drawable.ic_launcher_foreground, "Snooze", snoozeAction)
             .addAction(R.drawable.ic_launcher_foreground, "Complete", completeAction)
-            .setAutoCancel(true) // Automatically dismisses notification when tapped
+            .setAutoCancel(true)
 
-        // Display the notification
-        with(NotificationManagerCompat.from(context)) {
-            // Requires POST_NOTIFICATIONS permission check on Android 13+ (API 33+)
-            notify(notificationId, builder.build())
-        }
+        NotificationManagerCompat.from(context).notify(notificationId, builder.build())
     }
 
-    private fun tapAction(context: Context): PendingIntent {
+    private fun getTapAction(context: Context): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        return PendingIntent.getActivity(
             context,
             0,
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
-        return pendingIntent
     }
 
-    private fun bottomAction(myAction: String, requestCode: Int, context: Context): PendingIntent {
+    private fun getBottomAction(
+        myAction: String,
+        requestCode: Int,
+        context: Context,
+        notificationId: Int
+    ): PendingIntent {
         val intent = Intent(context, NotificationActionReceiver::class.java).apply {
             action = myAction
             putExtra(EXTRA_NOTIFICATION_ID, notificationId)
         }
-        val pendingIntent = PendingIntent.getBroadcast(
+        return PendingIntent.getBroadcast(
             context,
             requestCode,
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
-        return pendingIntent
     }
 }
 
 class NotificationActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
+        val taskTitle = intent.getStringExtra("TASK_TITLE") ?: "Task Reminder"
 
         when (intent.action) {
+            "ACTION_SHOW_NOTIFICATION" -> {
+                val taskId = intent.getStringExtra("TASK_ID")
+                val id = taskId?.hashCode() ?: ReminderService.NOTIFICATION_ID_BASE
+                ReminderService.showNotification(context, taskTitle, id)
+            }
             "ACTION_SNOOZE" -> {
                 // TODO handle snooze logic
-
-                if (notificationId == -1) {
+                if (notificationId != -1) {
                     NotificationManagerCompat.from(context).cancel(notificationId)
                 }
             }
             "ACTION_COMPLETE" -> {
                 // TODO handle complete logic
-
-                if (notificationId == -1) {
+                if (notificationId != -1) {
                     NotificationManagerCompat.from(context).cancel(notificationId)
                 }
             }

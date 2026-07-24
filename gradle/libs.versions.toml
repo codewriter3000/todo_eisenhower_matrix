@@ -10,6 +10,8 @@ kotlin = "2.4.10"
 composeBom = "2026.06.01"
 material3 = "1.4.0"
 material = "1.11.4"
+mockito = "5.23.0"
+mockitoKotlin = "6.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +32,8 @@ androidx-compose-material2 = { group = "androidx.compose.material", name = "mate
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

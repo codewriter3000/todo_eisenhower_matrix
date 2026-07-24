@@ -1,6 +1,7 @@
 package com.example.todo_eisenhower_matrix.ui.composable
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo_eisenhower_matrix.data.Task
 import com.example.todo_eisenhower_matrix.ui.viewmodel.TaskViewModel
@@ -8,6 +9,7 @@ import java.time.LocalDate
 
 @Composable
 fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
+    val context = LocalContext.current
     // Collect the task list from the ViewModel as Compose state
     val tasks by viewModel.tasks.collectAsState()
 
@@ -20,9 +22,9 @@ fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
             task = selectedTask!!,
             onSave = { updatedTask ->
                 if (tasks.any { it.id == updatedTask.id }) {
-                    viewModel.updateTask(updatedTask)
+                    viewModel.updateTask(context, updatedTask)
                 } else {
-                    viewModel.addTask(updatedTask)
+                    viewModel.addTask(context, updatedTask)
                 }
                 isEditing = false // Go back to list
             },
