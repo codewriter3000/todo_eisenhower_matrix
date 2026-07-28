@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.example.todo_eisenhower_matrix.services.ReminderService
 import com.example.todo_eisenhower_matrix.ui.carbon.CarbonTaskAppNavigation
-import com.example.todo_eisenhower_matrix.ui.carbon.CarbonTheme
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

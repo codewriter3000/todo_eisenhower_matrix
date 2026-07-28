@@ -1,5 +1,6 @@
 package com.example.todo_eisenhower_matrix.ui.carbon
 
+import com.example.todo_eisenhower_matrix.ui.theme.Carbon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,22 +45,24 @@ fun CarbonTextInput(
     Column(modifier = modifier) {
         Text(
             text = label,
-            style = CarbonTheme.typography.label01,
-            color = CarbonTheme.colors.textSecondary,
+            style = Carbon.typography.label01,
+            color = Carbon.colors.textSecondary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         TextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
-            textStyle = CarbonTheme.typography.bodyShort02,
+            textStyle = Carbon.typography.bodyShort02,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = CarbonTheme.colors.layer,
-                unfocusedContainerColor = CarbonTheme.colors.layer,
-                focusedIndicatorColor = CarbonTheme.colors.focus,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedTextColor = CarbonTheme.colors.textPrimary,
-                unfocusedTextColor = CarbonTheme.colors.textPrimary
+                focusedContainerColor = Carbon.colors.layer,
+                unfocusedContainerColor = Carbon.colors.layer,
+                focusedIndicatorColor = Carbon.colors.focus,
+                unfocusedIndicatorColor = Carbon.colors.textSecondary.copy(alpha = 0.3f),
+                focusedTextColor = Carbon.colors.textPrimary,
+                unfocusedTextColor = Carbon.colors.textPrimary,
+                focusedLabelColor = Carbon.colors.textSecondary,
+                unfocusedLabelColor = Carbon.colors.textSecondary
             ),
             shape = RectangleShape
         )
@@ -82,15 +85,15 @@ fun CarbonToggle(
     ) {
         Text(
             text = label,
-            style = CarbonTheme.typography.bodyShort02,
-            color = CarbonTheme.colors.textPrimary
+            style = Carbon.typography.bodyShort02,
+            color = Carbon.colors.textPrimary
         )
         Box(
             modifier = Modifier
                 .width(48.dp)
                 .height(24.dp)
                 .background(
-                    color = if (checked) CarbonTheme.colors.supportSuccess else CarbonTheme.colors.textSecondary,
+                    color = if (checked) Carbon.colors.supportSuccess else Carbon.colors.textSecondary,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { onCheckedChange(!checked) }
@@ -111,8 +114,8 @@ fun CarbonButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = CarbonTheme.colors.buttonPrimary,
-    contentColor: Color = CarbonTheme.colors.textOnColor,
+    backgroundColor: Color = Carbon.colors.buttonPrimary,
+    contentColor: Color = Carbon.colors.textOnColor,
     icon: ImageVector? = null
 ) {
     Surface(
@@ -131,7 +134,7 @@ fun CarbonButton(
         ) {
             Text(
                 text = text,
-                style = CarbonTheme.typography.bodyShort01
+                style = Carbon.typography.bodyShort01
             )
             if (icon != null) {
                 Spacer(modifier = Modifier.width(16.dp))
@@ -156,11 +159,11 @@ fun CarbonCheckbox(
             .size(18.dp)
             .border(
                 width = 1.dp,
-                color = if (checked) CarbonTheme.colors.buttonPrimary else CarbonTheme.colors.textPrimary,
+                color = if (checked) Carbon.colors.buttonPrimary else Carbon.colors.textPrimary,
                 shape = RectangleShape
             )
             .background(
-                color = if (checked) CarbonTheme.colors.buttonPrimary else Color.Transparent,
+                color = if (checked) Carbon.colors.buttonPrimary else Color.Transparent,
                 shape = RectangleShape
             )
             .toggleable(
@@ -174,7 +177,7 @@ fun CarbonCheckbox(
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
-                tint = CarbonTheme.colors.textOnColor,
+                tint = Carbon.colors.textOnColor,
                 modifier = Modifier.size(14.dp)
             )
         }
@@ -200,7 +203,7 @@ fun CarbonTag(
         ) {
             Text(
                 text = text,
-                style = CarbonTheme.typography.label01
+                style = Carbon.typography.label01
             )
         }
     }
@@ -216,8 +219,8 @@ fun CarbonHeader(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
-        color = CarbonTheme.colors.uiShell,
-        contentColor = CarbonTheme.colors.onUiShell
+        color = Carbon.colors.uiShell,
+        contentColor = Carbon.colors.onUiShell
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -225,7 +228,7 @@ fun CarbonHeader(
         ) {
             Text(
                 text = title,
-                style = CarbonTheme.typography.heading02,
+                style = Carbon.typography.heading02,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
             )
             Spacer(modifier = Modifier.weight(1f))

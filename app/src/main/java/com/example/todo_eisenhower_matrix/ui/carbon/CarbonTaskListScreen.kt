@@ -1,5 +1,8 @@
 package com.example.todo_eisenhower_matrix.ui.carbon
 
+import com.example.todo_eisenhower_matrix.ui.theme.Carbon
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonSubThemeG100
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -41,18 +44,20 @@ fun CarbonTaskListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CarbonTheme.colors.background)
+            .background(Carbon.colors.background)
     ) {
-        CarbonHeader(
-            title = "Eisenhower Matrix",
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
-        ) {
-            CarbonButton(
-                text = "Add task",
-                onClick = onAddTaskClick,
-                backgroundColor = Color.Transparent, // Ghost style for header
-                icon = Icons.Default.Add
-            )
+        CarbonSubThemeG100 {
+            CarbonHeader(
+                title = "Eisenhower Matrix",
+                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            ) {
+                CarbonButton(
+                    text = "Add task",
+                    onClick = onAddTaskClick,
+                    backgroundColor = Color.Transparent, // Ghost style for header
+                    icon = Icons.Default.Add
+                )
+            }
         }
 
         LazyColumn(
@@ -70,7 +75,7 @@ fun CarbonTaskListScreen(
                     onTaskClick = onTaskClick,
                     onToggleTask = onToggleTask
                 )
-                HorizontalDivider(color = CarbonTheme.colors.layerHover)
+                HorizontalDivider(color = Carbon.colors.layerHover)
             }
         }
     }
@@ -99,18 +104,18 @@ fun CarbonTaskItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = task.title,
-                style = CarbonTheme.typography.bodyShort02,
+                style = Carbon.typography.bodyShort02,
                 fontWeight = FontWeight.SemiBold,
                 textDecoration = if (task.isComplete) TextDecoration.LineThrough else TextDecoration.None,
-                color = if (task.isComplete) CarbonTheme.colors.textSecondary else CarbonTheme.colors.textPrimary
+                color = if (task.isComplete) Carbon.colors.textSecondary else Carbon.colors.textPrimary
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = "Due: ${task.getFormattedDueDate() ?: "None"}",
-                style = CarbonTheme.typography.caption01,
-                color = CarbonTheme.colors.textSecondary
+                style = Carbon.typography.caption01,
+                color = Carbon.colors.textSecondary
             )
         }
 
@@ -120,17 +125,17 @@ fun CarbonTaskItem(
 
 @Composable
 fun CarbonMatrixTag(isUrgent: Boolean, isImportant: Boolean) {
-    val (text, color) = when {
-        isUrgent && isImportant -> "Do First" to CarbonTheme.colors.buttonDanger
-        !isUrgent && isImportant -> "Schedule" to CarbonTheme.colors.supportInfo
-        isUrgent && !isImportant -> "Delegate" to CarbonTheme.colors.supportWarning
-        else -> "Eliminate" to CarbonTheme.colors.textSecondary
+    val (text, color, isDarkText) = when {
+        isUrgent && isImportant -> Triple("Do First", Carbon.colors.buttonDanger, false)
+        !isUrgent && isImportant -> Triple("Schedule", Carbon.colors.supportInfo, false)
+        isUrgent && !isImportant -> Triple("Delegate", Carbon.colors.supportWarning, true)
+        else -> Triple("Eliminate", Carbon.colors.textSecondary, false)
     }
 
     CarbonTag(
         text = text,
         backgroundColor = color.copy(alpha = 0.2f),
-        contentColor = color
+        contentColor = if (isDarkText) Color(0xFF161616) else color
     )
 }
 

@@ -1,57 +1,130 @@
 package com.example.todo_eisenhower_matrix.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+@Immutable
+data class CarbonColors(
+    val background: Color,
+    val layer: Color,
+    val layerHover: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val textPlaceholder: Color,
+    val textOnColor: Color,
+    val linkPrimary: Color,
+    val buttonPrimary: Color,
+    val buttonPrimaryHover: Color,
+    val buttonSecondary: Color,
+    val buttonDanger: Color,
+    val borderInteractive: Color,
+    val focus: Color,
+    val supportError: Color,
+    val supportSuccess: Color,
+    val supportWarning: Color,
+    val supportInfo: Color,
+    val uiShell: Color,
+    val onUiShell: Color
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+val CarbonWhiteColors = CarbonColors(
+    background = CarbonWhite_Background,
+    layer = CarbonWhite_Layer01,
+    layerHover = CarbonWhite_Layer02,
+    textPrimary = CarbonWhite_TextPrimary,
+    textSecondary = CarbonWhite_TextSecondary,
+    textPlaceholder = Color(0xFFA8A8A8),
+    textOnColor = Color.White,
+    linkPrimary = CarbonBlue60,
+    buttonPrimary = CarbonBlue60,
+    buttonPrimaryHover = CarbonBlue70,
+    buttonSecondary = Color(0xFF393939),
+    buttonDanger = CarbonSupportError,
+    borderInteractive = CarbonBlue60,
+    focus = CarbonBlue60,
+    supportError = CarbonSupportError,
+    supportSuccess = CarbonSupportSuccess,
+    supportWarning = CarbonSupportWarning,
+    supportInfo = CarbonSupportInfo,
+    uiShell = CarbonWhite_TextPrimary,
+    onUiShell = Color.White
 )
+
+val CarbonGray100Colors = CarbonColors(
+    background = CarbonGray100_Background,
+    layer = CarbonGray100_Layer01,
+    layerHover = CarbonGray100_Layer02,
+    textPrimary = CarbonGray100_TextPrimary,
+    textSecondary = CarbonGray100_TextSecondary,
+    textPlaceholder = Color(0xFF707070),
+    textOnColor = Color.White,
+    linkPrimary = Color(0xFF78A9FF),
+    buttonPrimary = CarbonBlue60,
+    buttonPrimaryHover = CarbonBlue70,
+    buttonSecondary = Color(0xFF6F6F6F),
+    buttonDanger = Color(0xFFFA4D56),
+    borderInteractive = Color(0xFF4589FF),
+    focus = Color.White,
+    supportError = Color(0xFFFA4D56),
+    supportSuccess = Color(0xFF42BE65),
+    supportWarning = CarbonSupportWarning,
+    supportInfo = Color(0xFF4589FF),
+    uiShell = CarbonGray100_Layer01,
+    onUiShell = Color.White
+)
+
+val LocalCarbonColors = staticCompositionLocalOf { CarbonWhiteColors }
+val LocalCarbonTypography = staticCompositionLocalOf { CarbonTypographyDefault }
+
+object Carbon {
+    val colors: CarbonColors
+        @Composable
+        get() = LocalCarbonColors.current
+
+    val typography: CarbonTypography
+        @Composable
+        get() = LocalCarbonTypography.current
+}
 
 @Composable
-fun Todo_Eisenhower_MatrixTheme(
+fun CarbonTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colors = if (darkTheme) CarbonGray100Colors else CarbonWhiteColors
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    CompositionLocalProvider(
+        LocalCarbonColors provides colors,
+        LocalCarbonTypography provides CarbonTypographyDefault
+    ) {
+        MaterialTheme(
+            colorScheme = lightColorScheme(
+                primary = CarbonBlue60,
+                background = colors.background,
+                surface = colors.background
+            ),
+            typography = Typography,
+            content = content
+        )
     }
+}
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+/**
+ * A sub-theme that forces the Carbon G100 (Gray 100) palette.
+ * Useful for headers or specific sections that should always be dark.
+ */
+@Composable
+fun CarbonSubThemeG100(content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalCarbonColors provides CarbonGray100Colors,
+        LocalCarbonTypography provides CarbonTypographyDefault
+    ) {
+        content()
+    }
 }

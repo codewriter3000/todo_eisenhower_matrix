@@ -1,5 +1,8 @@
 package com.example.todo_eisenhower_matrix.ui.carbon
 
+import com.example.todo_eisenhower_matrix.ui.theme.Carbon
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonSubThemeG100
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,14 +59,16 @@ fun CarbonEditTaskScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CarbonTheme.colors.background)
+            .background(Carbon.colors.background)
     ) {
-        CarbonHeader(
-            title = "Edit task",
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
-        ) {
-            IconButton(onClick = { onDelete(task) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = CarbonTheme.colors.textOnColor)
+        CarbonSubThemeG100 {
+            CarbonHeader(
+                title = "Edit task",
+                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            ) {
+                IconButton(onClick = { onDelete(task) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Carbon.colors.textOnColor)
+                }
             }
         }
 
@@ -80,13 +85,21 @@ fun CarbonEditTaskScreen(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = "Priority", style = CarbonTheme.typography.heading01)
+                Text(
+                    text = "Priority",
+                    style = Carbon.typography.heading01,
+                    color = Carbon.colors.textPrimary
+                )
                 CarbonToggle(label = "Urgent", checked = isUrgent, onCheckedChange = { isUrgent = it })
                 CarbonToggle(label = "Important", checked = isImportant, onCheckedChange = { isImportant = it })
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(text = "Scheduling", style = CarbonTheme.typography.heading01)
+                Text(
+                    text = "Scheduling",
+                    style = Carbon.typography.heading01,
+                    color = Carbon.colors.textPrimary
+                )
                 
                 CarbonTimeRow(
                     label = "Due date",
@@ -114,7 +127,7 @@ fun CarbonEditTaskScreen(
             CarbonButton(
                 text = "Cancel",
                 onClick = onCancel,
-                backgroundColor = CarbonTheme.colors.buttonSecondary,
+                backgroundColor = Carbon.colors.buttonSecondary,
                 modifier = Modifier.weight(1f)
             )
             CarbonButton(
@@ -168,15 +181,15 @@ fun CarbonTimeRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .background(CarbonTheme.colors.layer)
+            .background(Carbon.colors.layer)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = icon, contentDescription = null, tint = CarbonTheme.colors.textPrimary)
+        Icon(imageVector = icon, contentDescription = null, tint = Carbon.colors.textPrimary)
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = label, style = CarbonTheme.typography.label01, color = CarbonTheme.colors.textSecondary)
-            Text(text = value, style = CarbonTheme.typography.bodyShort02, color = CarbonTheme.colors.textPrimary)
+            Text(text = label, style = Carbon.typography.label01, color = Carbon.colors.textSecondary)
+            Text(text = value, style = Carbon.typography.bodyShort02, color = Carbon.colors.textPrimary)
         }
     }
 }
