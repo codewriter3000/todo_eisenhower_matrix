@@ -1,12 +1,15 @@
 package com.example.todo_eisenhower_matrix.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.uuid.Uuid
 
+@Entity(tableName = "tasks")
 data class Task(
-    val id: Uuid = Uuid.random(),
+    @PrimaryKey val id: Uuid = Uuid.random(),
     val title: String,
     val description: String? = null,
     val isComplete: Boolean = false,

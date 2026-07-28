@@ -8,8 +8,17 @@ import com.example.todo_eisenhower_matrix.ui.viewmodel.TaskViewModel
 import java.time.LocalDate
 
 @Composable
-fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
+fun TaskAppNavigation() {
     val context = LocalContext.current
+    val viewModel: TaskViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return TaskViewModel(context) as T
+            }
+        }
+    )
+    
     // Collect the task list from the ViewModel as Compose state
     val tasks by viewModel.tasks.collectAsState()
 
@@ -17,7 +26,7 @@ fun TaskAppNavigation(viewModel: TaskViewModel = viewModel()) {
     var selectedTask by remember { mutableStateOf<Task?>(null) }
     var isEditing by remember { mutableStateOf(false) }
 
-    if (isEditing && selectedTask != null) {
+    if (isEditing && (selectedTask != null)) {
         EditTaskScreen(
             task = selectedTask!!,
             onSave = { updatedTask ->

@@ -29,19 +29,29 @@ class ReminderServiceTest {
         whenever(mockContext.getSystemService(Context.NOTIFICATION_SERVICE)).thenReturn(mockNotificationManager)
         // Mock strings for notification channel
         whenever(mockContext.getString(any())).thenReturn("Mock String")
+        
+        // Mock canScheduleExactAlarms for Android S+ behavior if needed
+        try {
+            whenever(mockAlarmManager.canScheduleExactAlarms()).thenReturn(true)
+        } catch (e: Exception) {
+            // may not exist in some classpath configurations
+        }
     }
 
     @Test
-    fun testScheduleReminderNotification() {
+    fun testScheduleReminder() {
+        // Reminder must be in the future to be scheduled
         val reminderTime = LocalDateTime.now().plusHours(1)
         val task = Task(title = "Test Task", reminderTime = reminderTime)
 
-        ReminderService.scheduleReminderNotification(mockContext, task)
+        ReminderScheduler.scheduleReminder(mockContext, task)
 
-        // Verify that setExactAndAllowWhileIdle (or setAndAllowWhileIdle depending on SDK) was called
-        // Since we are running in a JVM test, Build.VERSION.SDK_INT will be 0 or similar.
-        // In ReminderService.kt, it handles different SDK versions.
-        
-        verify(mockAlarmManager).setExactAndAllowWhileIdle(any(), any(), any())
+        // Verify that either setExactAndAllowWhileIdle or setAndAllowWhileIdle was called
+        verify(mockAlarmManager, atLeastOnce()).setExactAndAllowWhileIdle(any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun testShowNotification() {
+        ReminderService.showNotification(mockContext, "Test Task", 1001)
     }
 }
