@@ -15,8 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.example.todo_eisenhower_matrix.services.ReminderService
-import com.example.todo_eisenhower_matrix.ui.composable.TaskAppNavigation
-import com.example.todo_eisenhower_matrix.ui.theme.Todo_Eisenhower_MatrixTheme
+import com.example.todo_eisenhower_matrix.ui.carbon.CarbonTaskAppNavigation
+import com.example.todo_eisenhower_matrix.ui.carbon.CarbonTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +24,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         ReminderService.createNotificationChannel(this)
         setContent {
-            Todo_Eisenhower_MatrixTheme {
+            CarbonTheme {
                 NotificationPermissionHandler()
-                TaskAppNavigation()
+                CarbonTaskAppNavigation()
             }
         }
     }
@@ -58,7 +58,7 @@ fun NotificationPermissionHandler() {
 @Preview
 @Composable
 fun TaskAppPreview() {
-    Todo_Eisenhower_MatrixTheme {
-        TaskAppNavigation()
+    CarbonTheme {
+        CarbonTaskAppNavigation()
     }
 }
