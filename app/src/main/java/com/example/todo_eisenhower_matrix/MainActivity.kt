@@ -12,10 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.example.todo_eisenhower_matrix.services.ReminderService
-import com.example.todo_eisenhower_matrix.ui.carbon.CarbonTaskAppNavigation
+import com.example.todo_eisenhower_matrix.ui.composable.TaskAppNavigation
 import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CarbonTheme {
                 NotificationPermissionHandler()
-                CarbonTaskAppNavigation()
+                TaskAppNavigation()
             }
         }
     }
@@ -39,7 +38,7 @@ fun NotificationPermissionHandler() {
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { _ ->
-                // Permission result handled by system, or add custom logic here
+                // Permission result handled by system
             }
         )
 
@@ -52,13 +51,5 @@ fun NotificationPermissionHandler() {
                 launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun TaskAppPreview() {
-    CarbonTheme {
-        CarbonTaskAppNavigation()
     }
 }

@@ -2,6 +2,7 @@ package com.example.todo_eisenhower_matrix.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -103,12 +104,36 @@ fun CarbonTheme(
         LocalCarbonColors provides colors,
         LocalCarbonTypography provides CarbonTypographyDefault
     ) {
-        MaterialTheme(
-            colorScheme = lightColorScheme(
+        val colorScheme = if (darkTheme) {
+            darkColorScheme(
                 primary = CarbonBlue60,
+                secondary = CarbonBlue60,
+                tertiary = CarbonBlue60,
                 background = colors.background,
-                surface = colors.background
-            ),
+                surface = colors.background,
+                onSurface = colors.textPrimary,
+                onBackground = colors.textPrimary,
+                primaryContainer = CarbonBlue70,
+                onPrimaryContainer = Color.White,
+                outline = colors.textPlaceholder
+            )
+        } else {
+            lightColorScheme(
+                primary = CarbonBlue60,
+                secondary = CarbonBlue60,
+                tertiary = CarbonBlue60,
+                background = colors.background,
+                surface = colors.background,
+                onSurface = colors.textPrimary,
+                onBackground = colors.textPrimary,
+                primaryContainer = CarbonBlue60,
+                onPrimaryContainer = Color.White,
+                outline = colors.textPlaceholder
+            )
+        }
+
+        MaterialTheme(
+            colorScheme = colorScheme,
             typography = Typography,
             content = content
         )

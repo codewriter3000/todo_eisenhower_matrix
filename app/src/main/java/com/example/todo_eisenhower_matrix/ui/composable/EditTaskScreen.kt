@@ -1,31 +1,26 @@
 package com.example.todo_eisenhower_matrix.ui.composable
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.DividerDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,12 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.todo_eisenhower_matrix.data.Task
+import com.example.todo_eisenhower_matrix.ui.theme.Carbon
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonSubThemeG100
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
 import java.time.format.DateTimeFormatter
 
-import com.example.todo_eisenhower_matrix.data.Task
-import java.time.LocalDateTime
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTaskScreen(
     task: Task,
@@ -48,13 +43,10 @@ fun EditTaskScreen(
     onCancel: () -> Unit,
     onDelete: (Task) -> Unit = {}
 ) {
-    // 1. Local state initialized with the existing task data
     var title by remember { mutableStateOf(task.title) }
     var isUrgent by remember { mutableStateOf(task.isUrgent) }
     var isImportant by remember { mutableStateOf(task.isImportant) }
     var isComplete by remember { mutableStateOf(task.isComplete) }
-
-    // In a production app, updating these would open DatePicker/TimePicker dialogs
     var dueDate by remember { mutableStateOf(task.dueDate) }
     var reminderTime by remember { mutableStateOf(task.reminderTime) }
 
@@ -64,143 +56,97 @@ fun EditTaskScreen(
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Edit Task") },
-                navigationIcon = {
-                    IconButton(onClick = onCancel) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { onDelete(task) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete Task")
-                    }
-                    TextButton(onClick = {
-                        // Pass the modified task back
-                        onSave(
-                            task.copy(
-                                title = title,
-                                isUrgent = isUrgent,
-                                isImportant = isImportant,
-                                isComplete = isComplete,
-                                dueDate = dueDate,
-                                reminderTime = reminderTime
-                            )
-                        )
-                    }) {
-                        Text("Save")
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Carbon.colors.background)
+    ) {
+        CarbonSubThemeG100 {
+            CarbonHeader(
+                title = "Edit task",
+                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            ) {
+                IconButton(onClick = { onDelete(task) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Carbon.colors.textOnColor)
                 }
-            )
+            }
         }
-    ) { paddingValues ->
+
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
-            // 2. Title Input
-            OutlinedTextField(
+            CarbonTextInput(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Task Title") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                label = "Task title"
             )
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color
-            )
-
-            // 3. Matrix Toggles (Urgent / Important)
-            Text(text = "Matrix Category", style = MaterialTheme.typography.titleMedium)
-
-            SwitchRow(
-                label = "Is Urgent?",
-                checked = isUrgent,
-                onCheckedChange = { isUrgent = it }
-            )
-
-            SwitchRow(
-                label = "Is Important?",
-                checked = isImportant,
-                onCheckedChange = { isImportant = it }
-            )
-
-            MatrixLabel(isUrgent = isUrgent, isImportant = isImportant)
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color
-            )
-
-            // 4. Date and Time Settings
-            Text(text = "Timing", style = MaterialTheme.typography.titleMedium)
-
-            // Due Date Row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDueDatePicker = true }
-                    .padding(vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Default.DateRange, contentDescription = "Due Date")
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text("Due Date")
-                    Text(
-                        text = dueDate?.format(dateFormatter) ?: "No due date set",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Priority",
+                    style = Carbon.typography.heading01,
+                    color = Carbon.colors.textPrimary
+                )
+                CarbonToggle(label = "Urgent", checked = isUrgent, onCheckedChange = { isUrgent = it })
+                CarbonToggle(label = "Important", checked = isImportant, onCheckedChange = { isImportant = it })
             }
 
-            // Reminder Time Row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showReminderPicker = true }
-                    .padding(vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Default.Notifications, contentDescription = "Reminder")
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text("Reminder")
-                    Text(
-                        text = reminderTime?.format(dateTimeFormatter) ?: "None set",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = "Scheduling",
+                    style = Carbon.typography.heading01,
+                    color = Carbon.colors.textPrimary
+                )
+                
+                TimeRow(
+                    label = "Due date",
+                    value = dueDate?.format(dateFormatter) ?: "None set",
+                    icon = Icons.Default.DateRange,
+                    onClick = { showDueDatePicker = true }
+                )
+
+                TimeRow(
+                    label = "Reminder",
+                    value = reminderTime?.format(dateTimeFormatter) ?: "None set",
+                    icon = Icons.Default.Notifications,
+                    onClick = { showReminderPicker = true }
+                )
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color
-            )
+            CarbonToggle(label = "Mark as complete", checked = isComplete, onCheckedChange = { isComplete = it })
+        }
 
-            // 5. Completion Status
-            SwitchRow(
-                label = "Mark as Complete",
-                checked = isComplete,
-                onCheckedChange = { isComplete = it }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.navigationBars)
+        ) {
+            CarbonButton(
+                text = "Cancel",
+                onClick = onCancel,
+                backgroundColor = Carbon.colors.buttonSecondary,
+                modifier = Modifier.weight(1f)
+            )
+            CarbonButton(
+                text = "Save",
+                onClick = {
+                    onSave(task.copy(
+                        title = title,
+                        isUrgent = isUrgent,
+                        isImportant = isImportant,
+                        isComplete = isComplete,
+                        dueDate = dueDate,
+                        reminderTime = reminderTime
+                    ))
+                },
+                modifier = Modifier.weight(1f)
             )
         }
     }
 
-    // Dialogs
     if (showDueDatePicker) {
         MyDatePickerDialog(
             initialDate = dueDate ?: java.time.LocalDate.now(),
@@ -214,7 +160,7 @@ fun EditTaskScreen(
 
     if (showReminderPicker) {
         DateTimePickerDialog(
-            initialDateTime = reminderTime ?: LocalDateTime.now(),
+            initialDateTime = reminderTime ?: java.time.LocalDateTime.now(),
             onDismiss = { showReminderPicker = false },
             onConfirm = {
                 reminderTime = it
@@ -224,42 +170,38 @@ fun EditTaskScreen(
     }
 }
 
-// Helper Composable for standardizing the Switch rows
 @Composable
-fun SwitchRow(
+fun TimeRow(
     label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .clickable { onClick() }
+            .background(Carbon.colors.layer)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyLarge)
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
+        Icon(imageVector = icon, contentDescription = null, tint = Carbon.colors.textPrimary)
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(text = label, style = Carbon.typography.label01, color = Carbon.colors.textSecondary)
+            Text(text = value, style = Carbon.typography.bodyShort02, color = Carbon.colors.textPrimary)
+        }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun EditTaskScreenPreview() {
-    EditTaskScreen(
-        task = Task(
-            title = "Sample Task",
-            description = "This is a sample task for demonstration purposes.",
-            isUrgent = true,
-            isImportant = false,
-            isComplete = false,
-            dueDate = null,
-            reminderTime = null
-        ),
-        onSave = {},
-        onCancel = {}
-    )
+    CarbonTheme {
+        EditTaskScreen(
+            task = Task(title = "Redesign UI", isUrgent = true, isImportant = true),
+            onSave = {},
+            onCancel = {}
+        )
+    }
 }

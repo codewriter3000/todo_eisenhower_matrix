@@ -9,6 +9,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import com.example.todo_eisenhower_matrix.ui.theme.Carbon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,20 +28,36 @@ fun MyDatePickerDialog(
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = {
-                datePickerState.selectedDateMillis?.let { millis ->
-                    val selectedDate = Instant.ofEpochMilli(millis)
-                        .atZone(ZoneOffset.UTC)
-                        .toLocalDate()
-                    onConfirm(selectedDate)
-                }
-            }) { Text("Confirm") }
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val selectedDate = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
+                        onConfirm(selectedDate)
+                    }
+                },
+                colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.buttonPrimary)
+            ) { Text("Confirm") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.textSecondary)
+            ) { Text("Cancel") }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(
+            state = datePickerState,
+            colors = DatePickerDefaults.colors(
+                titleContentColor = Carbon.colors.textPrimary,
+                headlineContentColor = Carbon.colors.textPrimary,
+                selectedDayContainerColor = Carbon.colors.buttonPrimary,
+                selectedDayContentColor = Carbon.colors.textOnColor,
+                todayContentColor = Carbon.colors.buttonPrimary,
+                todayDateBorderColor = Carbon.colors.buttonPrimary
+            )
+        )
     }
 }
 
@@ -79,38 +96,70 @@ fun DateTimePickerDialog(
         DatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(onClick = { isPickingTime = true }) { Text("Next") }
+                TextButton(
+                    onClick = { isPickingTime = true },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.buttonPrimary)
+                ) { Text("Next") }
             },
             dismissButton = {
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.textSecondary)
+                ) { Text("Cancel") }
             }
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    titleContentColor = Carbon.colors.textPrimary,
+                    headlineContentColor = Carbon.colors.textPrimary,
+                    selectedDayContainerColor = Carbon.colors.buttonPrimary,
+                    selectedDayContentColor = Carbon.colors.textOnColor,
+                    todayContentColor = Carbon.colors.buttonPrimary,
+                    todayDateBorderColor = Carbon.colors.buttonPrimary
+                )
+            )
         }
     } else {
         // Step 2: Pick Time
         AlertDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(onClick = {
-                    // Combine the selected Date and Time into a single LocalDateTime
-                    val selectedMillis = datePickerState.selectedDateMillis ?: System.currentTimeMillis()
-                    val selectedDate = Instant.ofEpochMilli(selectedMillis)
-                        .atZone(ZoneOffset.UTC)
-                        .toLocalDate()
+                TextButton(
+                    onClick = {
+                        // Combine the selected Date and Time into a single LocalDateTime
+                        val selectedMillis = datePickerState.selectedDateMillis ?: System.currentTimeMillis()
+                        val selectedDate = Instant.ofEpochMilli(selectedMillis)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
 
-                    val selectedTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
+                        val selectedTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
 
-                    onConfirm(LocalDateTime.of(selectedDate, selectedTime))
-                }) {
+                        onConfirm(LocalDateTime.of(selectedDate, selectedTime))
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.buttonPrimary)
+                ) {
                     Text("Confirm")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { isPickingTime = false }) { Text("Back") }
+                TextButton(
+                    onClick = { isPickingTime = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Carbon.colors.textSecondary)
+                ) { Text("Back") }
             },
             text = {
-                TimePicker(state = timePickerState)
+                TimePicker(
+                    state = timePickerState,
+                    colors = TimePickerDefaults.colors(
+                        clockDialColor = Carbon.colors.layer,
+                        selectorColor = Carbon.colors.buttonPrimary,
+                        periodSelectorSelectedContainerColor = Carbon.colors.buttonPrimary.copy(alpha = 0.2f),
+                        periodSelectorSelectedContentColor = Carbon.colors.buttonPrimary,
+                        timeSelectorSelectedContainerColor = Carbon.colors.buttonPrimary.copy(alpha = 0.2f),
+                        timeSelectorSelectedContentColor = Carbon.colors.buttonPrimary
+                    )
+                )
             }
         )
     }

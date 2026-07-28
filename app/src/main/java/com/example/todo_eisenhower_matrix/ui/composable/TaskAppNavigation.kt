@@ -6,6 +6,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo_eisenhower_matrix.data.Task
 import com.example.todo_eisenhower_matrix.ui.viewmodel.TaskViewModel
 import java.time.LocalDate
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
 
 @Composable
 fun TaskAppNavigation() {
@@ -19,14 +21,11 @@ fun TaskAppNavigation() {
         }
     )
     
-    // Collect the task list from the ViewModel as Compose state
     val tasks by viewModel.tasks.collectAsState()
-
-    // State to track which screen we are on, and which task is selected
     var selectedTask by remember { mutableStateOf<Task?>(null) }
     var isEditing by remember { mutableStateOf(false) }
 
-    if (isEditing && (selectedTask != null)) {
+    if (isEditing && selectedTask != null) {
         EditTaskScreen(
             task = selectedTask!!,
             onSave = { updatedTask ->
@@ -35,7 +34,7 @@ fun TaskAppNavigation() {
                 } else {
                     viewModel.addTask(context, updatedTask)
                 }
-                isEditing = false // Go back to list
+                isEditing = false
             },
             onCancel = { isEditing = false },
             onDelete = { taskToDelete ->
@@ -44,13 +43,10 @@ fun TaskAppNavigation() {
             }
         )
     } else {
-        // Pass callbacks to handle the Floating Action Button and List Item clicks
         TaskListScreen(
             tasks = tasks,
             onAddTaskClick = {
-                // Create a temporary task and immediately open the edit screen
-                val newTask = Task(title = "", dueDate = LocalDate.now())
-                selectedTask = newTask
+                selectedTask = Task(title = "", dueDate = LocalDate.now())
                 isEditing = true
             },
             onTaskClick = { clickedTask ->
@@ -61,5 +57,13 @@ fun TaskAppNavigation() {
                 viewModel.toggleTaskCompletion(taskToToggle.id)
             }
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TaskAppNavigationPreview() {
+    CarbonTheme {
+        TaskAppNavigation()
     }
 }
