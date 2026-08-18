@@ -63,8 +63,7 @@ fun EditTaskScreen(
     ) {
         CarbonSubThemeG100 {
             CarbonHeader(
-                title = "Edit task",
-                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+                title = "Edit task"
             ) {
                 IconButton(onClick = { onDelete(task) }) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Carbon.colors.textOnColor)

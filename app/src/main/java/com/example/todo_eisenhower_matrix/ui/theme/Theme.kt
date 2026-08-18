@@ -31,11 +31,13 @@ data class CarbonColors(
     val supportWarning: Color,
     val supportInfo: Color,
     val uiShell: Color,
-    val onUiShell: Color
+    val onUiShell: Color,
+    val headerBorder: Color
 )
 
 val CarbonWhiteColors = CarbonColors(
     background = CarbonWhite_Background,
+    headerBorder = CarbonWhite_Layer03,
     layer = CarbonWhite_Layer01,
     layerHover = CarbonWhite_Layer02,
     textPrimary = CarbonWhite_TextPrimary,
@@ -54,11 +56,12 @@ val CarbonWhiteColors = CarbonColors(
     supportWarning = CarbonSupportWarning,
     supportInfo = CarbonSupportInfo,
     uiShell = CarbonWhite_TextPrimary,
-    onUiShell = Color.White
+    onUiShell = Color.White,
 )
 
 val CarbonGray100Colors = CarbonColors(
     background = CarbonGray100_Background,
+    headerBorder = CarbonGray100_Layer03,
     layer = CarbonGray100_Layer01,
     layerHover = CarbonGray100_Layer02,
     textPrimary = CarbonGray100_TextPrimary,

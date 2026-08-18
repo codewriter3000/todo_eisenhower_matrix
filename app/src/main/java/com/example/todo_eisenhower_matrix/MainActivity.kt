@@ -19,8 +19,8 @@ import com.example.todo_eisenhower_matrix.ui.theme.CarbonTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         ReminderService.createNotificationChannel(this)
         setContent {
             CarbonTheme {

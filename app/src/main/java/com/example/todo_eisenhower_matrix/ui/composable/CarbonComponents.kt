@@ -13,10 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.todo_eisenhower_matrix.ui.theme.Carbon
 
@@ -25,7 +28,8 @@ fun CarbonTextInput(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxLength: Int = 30
 ) {
     Column(modifier = modifier) {
         Text(
@@ -36,9 +40,17 @@ fun CarbonTextInput(
         )
         TextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                val singleLineValue = newValue.replace("\n", "")
+                if (singleLineValue.length <= maxLength) {
+                    onValueChange(singleLineValue)
+                } else {
+                    onValueChange(singleLineValue.take(maxLength))
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             textStyle = Carbon.typography.bodyShort02,
+            singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Carbon.colors.layer,
                 unfocusedContainerColor = Carbon.colors.layer,
@@ -78,7 +90,7 @@ fun CarbonToggle(
                 .width(48.dp)
                 .height(24.dp)
                 .background(
-                    color = if (checked) Carbon.colors.supportSuccess else Carbon.colors.textSecondary,
+                    color = if (checked) Carbon.colors.supportSuccess else Carbon.colors.layer,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { onCheckedChange(!checked) }
@@ -200,24 +212,45 @@ fun CarbonHeader(
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
+    val borderColor = Color(0xFF6F6F6F)
+
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(48.dp),
+        modifier = modifier.fillMaxWidth()
+            .drawBehind {
+                drawLine(
+                    color = borderColor,
+                    start = Offset(0f, size.height),
+                    end = Offset(size.width, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
+            },
         color = Carbon.colors.uiShell,
         contentColor = Carbon.colors.onUiShell
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
         ) {
-            Text(
-                text = title,
-                style = Carbon.typography.heading02,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            actions()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = Carbon.typography.heading01,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                )
+
+                Row(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = actions
+                )
+            }
         }
     }
 }
