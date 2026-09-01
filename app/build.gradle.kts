@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todo_eisenhower_matrix"
+    namespace = "com.micharski.eisenhower"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.example.todo_eisenhower_matrix"
+        applicationId = "com.micharski.eisenhower"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 4
+        versionName = "1.0.0 (4)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,7 +21,7 @@ android {
     buildTypes {
         release {
             optimization {
-                enable = false
+                enable = true
             }
         }
     }

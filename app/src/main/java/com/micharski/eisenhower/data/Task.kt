@@ -1,0 +1,29 @@
+package com.micharski.eisenhower.data
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import kotlin.uuid.Uuid
+
+@Entity(tableName = "tasks")
+data class Task(
+    @PrimaryKey val id: Uuid = Uuid.random(),
+    val title: String,
+    val description: String? = null,
+    val isComplete: Boolean = false,
+    val isUrgent: Boolean = false,
+    val isImportant: Boolean = false,
+    val dueDate: LocalDate? = null,
+    val reminderTime: LocalDateTime? = null
+) {
+    fun getFormattedDueDate(): String? {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        return dueDate?.format(formatter)
+    }
+    fun getFormattedReminder(): String? {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        return reminderTime?.format(formatter)
+    }
+}
